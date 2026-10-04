@@ -344,7 +344,7 @@
 
             const pct = Math.min(100, Math.round((completedVids / totalVids) * 100));
             const remaining = Math.max(0, totalVids - completedVids);
-            const estDays = Math.ceil(remaining / 3);
+            const estDays = Math.ceil(remaining / 2);
 
             document.getElementById("overallPercentage").innerText = `${pct}%`;
             document.getElementById("videoFraction").innerText = `${completedVids} / ${totalVids} vids`;
