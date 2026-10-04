@@ -32,22 +32,14 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 3px;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-12 antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- Navigation / Header -->
+    <!-- Header -->
     <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -61,14 +53,14 @@
             </div>
             <button id="resetAllBtn" class="text-xs bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-800/50 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
                 <i class="fa-solid fa-rotate-left"></i>
-                <span>Reset</span>
+                <span>Reset All Data</span>
             </button>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto px-4 pt-4 space-y-5">
 
-        <!-- Mode Switcher Banner -->
+        <!-- Mode Switcher -->
         <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
             <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
                 <i class="fa-solid fa-sliders text-brand-500"></i> Active Target Mode
@@ -89,7 +81,7 @@
             </div>
         </section>
 
-        <!-- Overall Progress Metrics -->
+        <!-- Maths Syllabus Summary -->
         <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-sm">
             <div class="flex justify-between items-end">
                 <div>
@@ -106,12 +98,10 @@
                 </div>
             </div>
 
-            <!-- Big Progress Bar -->
             <div class="w-full bg-slate-950 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-800">
                 <div id="overallProgressBar" class="bg-gradient-to-r from-brand-600 to-emerald-400 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
             </div>
 
-            <!-- Detailed Stat Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                 <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-center">
                     <p class="text-[10px] text-slate-400 uppercase font-semibold">Total Videos</p>
@@ -132,16 +122,32 @@
             </div>
         </section>
 
-        <!-- Daily Checklist Section -->
+        <!-- Daily Checklist Section with In-App Editing -->
         <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-list-check text-emerald-400"></i>
                     <h2 class="font-bold text-base text-white">Daily Tasks</h2>
                 </div>
-                <button onclick="resetDailyTasks()" class="text-[11px] text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 transition">
-                    <i class="fa-solid fa-arrows-rotate mr-1"></i> Clear Checks
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleEditGoalForm()" class="text-[11px] text-brand-400 hover:text-brand-300 bg-brand-950/60 hover:bg-brand-900/60 px-2.5 py-1 rounded-lg border border-brand-800/60 transition">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i> <span id="editToggleText">Edit Goals</span>
+                    </button>
+                    <button onclick="resetDailyTasks()" class="text-[11px] text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Clear Checks
+                    </button>
+                </div>
+            </div>
+
+            <!-- Goal Editor Panel (Hidden by default) -->
+            <div id="goalEditorPanel" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+                <p class="text-xs text-slate-400 font-medium">Add a custom goal for <span id="editorModeLabel" class="text-brand-400 font-bold"></span> mode:</p>
+                <div class="flex gap-2">
+                    <input type="text" id="newGoalInput" placeholder="e.g. Solve 30 Geometry PYQs" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                    <button onclick="addCustomGoal()" class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                        <i class="fa-solid fa-plus mr-1"></i> Add
+                    </button>
+                </div>
             </div>
 
             <!-- Daily Progress Bar -->
@@ -158,6 +164,34 @@
             <!-- Checkbox items container -->
             <div id="checklistContainer" class="space-y-2 pt-1">
                 <!-- Dynamically populated via JavaScript -->
+            </div>
+        </section>
+
+        <!-- GK & General Awareness Progress Section -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-book-bookmark text-amber-400"></i>
+                    <h2 class="font-bold text-base text-white">GK & General Awareness</h2>
+                </div>
+                <button onclick="toggleGkEditor()" class="text-[11px] text-amber-400 hover:text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 px-2.5 py-1 rounded-lg border border-amber-800/60 transition">
+                    <i class="fa-solid fa-plus mr-1"></i> Add Topic
+                </button>
+            </div>
+
+            <!-- GK Topic Editor Form -->
+            <div id="gkEditorPanel" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input type="text" id="newGkSubjectInput" placeholder="Subject / Module Name" class="sm:col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                    <input type="number" id="newGkTotalInput" placeholder="Total Topics" min="1" value="15" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                </div>
+                <button onclick="addGkSubject()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-1.5 rounded-lg text-xs font-semibold transition">
+                    Save GK Module
+                </button>
+            </div>
+
+            <div id="gkContainer" class="space-y-2.5">
+                <!-- Dynamically populated -->
             </div>
         </section>
 
@@ -179,7 +213,6 @@
     </main>
 
     <script>
-        // Data Definitions
         const CLUSTERS_CONFIG = [
             { id: "c1", name: "1. Foundation Phase", total: 56, icon: "fa-calculator" },
             { id: "c2", name: "2. Ratio Clusters", total: 70, icon: "fa-percent" },
@@ -191,7 +224,7 @@
             { id: "c8", name: "8. Data & Stats", total: 30, icon: "fa-chart-pie" }
         ];
 
-        const TASKS_SPRINT = [
+        const DEFAULT_TASKS_SPRINT = [
             { id: "task_math_vid", label: "Maths: Watch 2 Concept Videos" },
             { id: "task_math_pyq", label: "Maths: Solve 20–25 PYQs" },
             { id: "task_gk", label: "GK: 1 Sub-topic + Summary Notes" },
@@ -200,32 +233,40 @@
             { id: "task_reasoning", label: "Reasoning: 1 Video / 20 PYQ Practice" }
         ];
 
-        const TASKS_SEM = [
+        const DEFAULT_TASKS_SEM = [
             { id: "task_sem_math", label: "Maths: Solve 15 Maintenance PYQs / Formulas" },
             { id: "task_sem_eng", label: "English: 15m Rapid Vocab Review" },
             { id: "task_sem_degree", label: "B.Sc. Degree: Zoology / Botany / Chemistry Study" }
         ];
 
-        // Default State
+        const DEFAULT_GK_SUBJECTS = [
+            { id: "gk_polity", name: "Polity & Constitution", completed: 0, total: 15 },
+            { id: "gk_history", name: "Modern & Ancient History", completed: 0, total: 20 },
+            { id: "gk_geo", name: "Geography & Environment", completed: 0, total: 15 },
+            { id: "gk_sci", name: "General Science (Bio/Chem/Phys)", completed: 0, total: 25 },
+            { id: "gk_static", name: "Static GK (Art, Culture, Parks)", completed: 0, total: 18 }
+        ];
+
         const DEFAULT_STATE = {
-            mode: "sprint", // 'sprint' or 'sem'
-            clusterProgress: {
-                c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0, c7: 0, c8: 0
-            },
+            mode: "sprint",
+            clusterProgress: { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0, c7: 0, c8: 0 },
+            sprintTasks: DEFAULT_TASKS_SPRINT,
+            semTasks: DEFAULT_TASKS_SEM,
+            gkSubjects: DEFAULT_GK_SUBJECTS,
             dailyTasks: {},
             lastDate: new Date().toDateString()
         };
 
         let appState = loadState();
+        let isEditingGoals = false;
 
-        // Initialize application
         document.addEventListener("DOMContentLoaded", () => {
             checkAutoDailyReset();
             initDateDisplay();
             renderApp();
 
             document.getElementById("resetAllBtn").addEventListener("click", () => {
-                if (confirm("Are you sure you want to reset all saved progress?")) {
+                if (confirm("Are you sure you want to reset all saved progress and goals?")) {
                     localStorage.removeItem("ssc_cgl_2027_data");
                     appState = loadState();
                     renderApp();
@@ -233,7 +274,6 @@
             });
         });
 
-        // Load state from local storage
         function loadState() {
             const saved = localStorage.getItem("ssc_cgl_2027_data");
             if (saved) {
@@ -247,19 +287,16 @@
             return JSON.parse(JSON.stringify(DEFAULT_STATE));
         }
 
-        // Save state to local storage
         function saveState() {
             localStorage.setItem("ssc_cgl_2027_data", JSON.stringify(appState));
         }
 
-        // Date Display
         function initDateDisplay() {
             const now = new Date();
             const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
             document.getElementById("currentDateDisplay").innerText = now.toLocaleDateString('en-US', options);
         }
 
-        // Auto-reset checklist if date changes
         function checkAutoDailyReset() {
             const today = new Date().toDateString();
             if (appState.lastDate !== today) {
@@ -269,22 +306,20 @@
             }
         }
 
-        // Set mode
         function setMode(newMode) {
             appState.mode = newMode;
             saveState();
             renderApp();
         }
 
-        // Main Render Function
         function renderApp() {
             renderModeUI();
             renderMathsSummary();
             renderDailyChecklist();
+            renderGkSection();
             renderClustersList();
         }
 
-        // Render Mode Selector Buttons
         function renderModeUI() {
             const sprintBtn = document.getElementById("modeSprintBtn");
             const semBtn = document.getElementById("modeSemBtn");
@@ -298,7 +333,6 @@
             }
         }
 
-        // Calculate and Render Maths Metrics
         function renderMathsSummary() {
             let totalVids = 0;
             let completedVids = 0;
@@ -321,28 +355,84 @@
             document.getElementById("statEstDays").innerText = estDays;
         }
 
-        // Render Daily Checklist
+        /* Daily Checklist Editing Functions */
+        function toggleEditGoalForm() {
+            isEditingGoals = !isEditingGoals;
+            const panel = document.getElementById("goalEditorPanel");
+            const label = document.getElementById("editorModeLabel");
+            const toggleText = document.getElementById("editToggleText");
+
+            if (isEditingGoals) {
+                panel.classList.remove("hidden");
+                label.innerText = appState.mode === "sprint" ? "Full Sprint" : "Sem-5";
+                toggleText.innerText = "Done Editing";
+            } else {
+                panel.classList.add("hidden");
+                toggleText.innerText = "Edit Goals";
+            }
+            renderDailyChecklist();
+        }
+
+        function addCustomGoal() {
+            const input = document.getElementById("newGoalInput");
+            const text = input.value.trim();
+            if (!text) return;
+
+            const newGoal = {
+                id: "custom_" + Date.now(),
+                label: text
+            };
+
+            if (appState.mode === "sprint") {
+                appState.sprintTasks.push(newGoal);
+            } else {
+                appState.semTasks.push(newGoal);
+            }
+
+            input.value = "";
+            saveState();
+            renderDailyChecklist();
+        }
+
+        function removeGoal(taskId) {
+            if (appState.mode === "sprint") {
+                appState.sprintTasks = appState.sprintTasks.filter(t => t.id !== taskId);
+            } else {
+                appState.semTasks = appState.semTasks.filter(t => t.id !== taskId);
+            }
+            delete appState.dailyTasks[taskId];
+            saveState();
+            renderDailyChecklist();
+        }
+
         function renderDailyChecklist() {
             const container = document.getElementById("checklistContainer");
             container.innerHTML = "";
 
-            const currentTasks = appState.mode === "sprint" ? TASKS_SPRINT : TASKS_SEM;
+            const currentTasks = appState.mode === "sprint" ? appState.sprintTasks : appState.semTasks;
             let completedCount = 0;
 
             currentTasks.forEach(task => {
                 const isChecked = !!appState.dailyTasks[task.id];
                 if (isChecked) completedCount++;
 
-                const taskEl = document.createElement("label");
-                taskEl.className = `flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer select-none ${
+                const taskEl = document.createElement("div");
+                taskEl.className = `flex items-center justify-between p-3 rounded-xl border transition-all ${
                     isChecked 
-                        ? "bg-emerald-950/20 border-emerald-800/50 text-slate-300 line-through" 
-                        : "bg-slate-950/60 border-slate-800/80 text-slate-200 hover:border-slate-700"
+                        ? "bg-emerald-950/20 border-emerald-800/50 text-slate-300" 
+                        : "bg-slate-950/60 border-slate-800/80 text-slate-200"
                 }`;
 
                 taskEl.innerHTML = `
-                    <span class="text-xs sm:text-sm font-medium pr-2">${task.label}</span>
-                    <input type="checkbox" ${isChecked ? "checked" : ""} class="w-5 h-5 accent-emerald-500 rounded border-slate-700 bg-slate-900 cursor-pointer">
+                    <label class="flex items-center space-x-3 cursor-pointer flex-1">
+                        <input type="checkbox" ${isChecked ? "checked" : ""} class="w-5 h-5 accent-emerald-500 rounded border-slate-700 bg-slate-900 cursor-pointer">
+                        <span class="text-xs sm:text-sm font-medium ${isChecked ? 'line-through opacity-70' : ''}">${task.label}</span>
+                    </label>
+                    ${isEditingGoals ? `
+                        <button onclick="removeGoal('${task.id}')" class="text-rose-500 hover:text-rose-400 p-1 text-xs transition ml-2">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    ` : ''}
                 `;
 
                 const checkbox = taskEl.querySelector("input");
@@ -369,7 +459,80 @@
             renderDailyChecklist();
         }
 
-        // Render Clusters List with Controls
+        /* GK Section Functions */
+        function toggleGkEditor() {
+            const panel = document.getElementById("gkEditorPanel");
+            panel.classList.toggle("hidden");
+        }
+
+        function addGkSubject() {
+            const nameInput = document.getElementById("newGkSubjectInput");
+            const totalInput = document.getElementById("newGkTotalInput");
+            const name = nameInput.value.trim();
+            const total = parseInt(totalInput.value) || 10;
+
+            if (!name) return;
+
+            appState.gkSubjects.push({
+                id: "gk_" + Date.now(),
+                name: name,
+                completed: 0,
+                total: total
+            });
+
+            nameInput.value = "";
+            toggleGkEditor();
+            saveState();
+            renderGkSection();
+        }
+
+        function adjustGk(gkId, delta) {
+            const item = appState.gkSubjects.find(g => g.id === gkId);
+            if (!item) return;
+
+            let updated = item.completed + delta;
+            if (updated < 0) updated = 0;
+            if (updated > item.total) updated = item.total;
+
+            item.completed = updated;
+            saveState();
+            renderGkSection();
+        }
+
+        function renderGkSection() {
+            const container = document.getElementById("gkContainer");
+            container.innerHTML = "";
+
+            appState.gkSubjects.forEach(gk => {
+                const pct = Math.min(100, Math.round((gk.completed / gk.total) * 100));
+
+                const card = document.createElement("div");
+                card.className = "bg-slate-950/80 border border-slate-800 rounded-xl p-3 space-y-2";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-xs text-slate-200">${gk.name}</h4>
+                            <p class="text-[10px] text-slate-400">${gk.completed} of ${gk.total} topics (${pct}%)</p>
+                        </div>
+                        <div class="flex items-center space-x-1 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+                            <button onclick="adjustGk('${gk.id}', -1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold text-xs flex items-center justify-center">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+                            <span class="w-7 text-center text-xs font-bold text-slate-200">${gk.completed}</span>
+                            <button onclick="adjustGk('${gk.id}', 1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold text-xs flex items-center justify-center">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                        <div class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        /* Maths Clusters Breakdown */
         function renderClustersList() {
             const container = document.getElementById("clustersContainer");
             container.innerHTML = "";
@@ -393,7 +556,6 @@
                             </div>
                         </div>
 
-                        <!-- Counter Controls -->
                         <div class="flex items-center space-x-1 bg-slate-950 border border-slate-800 p-1 rounded-xl">
                             <button onclick="adjustCluster('${c.id}', -1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold active:scale-95 transition flex items-center justify-center">
                                 <i class="fa-solid fa-minus text-xs"></i>
@@ -407,7 +569,6 @@
                         </div>
                     </div>
 
-                    <!-- Cluster Progress Bar -->
                     <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800/80">
                         <div class="bg-brand-500 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
                     </div>
@@ -417,7 +578,6 @@
             });
         }
 
-        // Adjust Cluster Value via Buttons
         function adjustCluster(clusterId, delta) {
             const config = CLUSTERS_CONFIG.find(c => c.id === clusterId);
             if (!config) return;
@@ -434,7 +594,6 @@
             renderClustersList();
         }
 
-        // Set Cluster Value via Direct Input
         function setClusterValue(clusterId, val, max) {
             let num = parseInt(val) || 0;
             if (num < 0) num = 0;
