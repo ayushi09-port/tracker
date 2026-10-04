@@ -104,6 +104,21 @@
 
             <p id="paceNote" class="text-xs text-slate-400"></p>
 
+            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5">
+                <span class="text-xs text-slate-300"><i class="fa-solid fa-bullseye text-brand-500 mr-1"></i> Daily video target</span>
+                <div class="flex items-center space-x-1 bg-slate-950 border border-slate-800 p-1 rounded-lg">
+                    <button onclick="adjustDailyTarget(-1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-400 active:scale-95 transition flex items-center justify-center">
+                       <i class="fa-solid fa-minus text-xs"></i>
+                    </button>
+                    <span id="dailyTargetValue" class="w-8 text-center text-sm font-bold text-slate-100">2</span>
+                    <button onclick="adjustDailyTarget(1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 active:scale-95 transition flex items-center justify-center">
+                       <i class="fa-solid fa-plus text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <p id="statEstLabel" class="text-[10px] text-slate-400 uppercase font-semibold">Est. Days (2/day)</p>
+
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                 <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-center">
                     <p class="text-[10px] text-slate-400 uppercase font-semibold">Total Videos</p>
@@ -251,6 +266,7 @@
 
         const DEFAULT_STATE = {
             mode: "sprint",
+            dailyTarget: 2,
             clusterProgress: { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0, c7: 0, c8: 0 },
             sprintTasks: DEFAULT_TASKS_SPRINT,
             semTasks: DEFAULT_TASKS_SEM,
@@ -308,6 +324,13 @@
             }
         }
 
+        function adjustDailyTarget(delta) {
+        const current = appState.dailyTarget || 2;
+        appState.dailyTarget = Math.min(10, Math.max(1, current + delta));
+        saveState();
+        renderMathsSummary();
+        }
+
         function setMode(newMode) {
             appState.mode = newMode;
             saveState();
@@ -346,7 +369,8 @@
 
             const pct = Math.min(100, Math.round((completedVids / totalVids) * 100));
             const remaining = Math.max(0, totalVids - completedVids);
-            const estDays = Math.ceil(remaining / 2);
+            const target = appState.dailyTarget || 2;
+            const estDays = Math.ceil(remaining / target);
 
             document.getElementById("statTotalVids").innerText = totalVids;
 
@@ -357,13 +381,19 @@
             document.getElementById("statCompleted").innerText = completedVids;
             document.getElementById("statRemaining").innerText = remaining;
             document.getElementById("statEstDays").innerText = estDays;
+            document.getElementById("dailyTargetValue").innerText = target;
+            document.getElementById("statEstLabel").innerText = `Est. Days (${target}/day)`;
 
             const TARGET_DATE = new Date("2027-04-30");
-            const today = new Date();
-            const daysLeft = Math.max(1, Math.ceil((TARGET_DATE - today) / 86400000));
+            const daysLeft = Math.max(1, Math.ceil((TARGET_DATE - new Date()) / 86400000));
             const perDay = (remaining / daysLeft).toFixed(1);
+            const onTrack = estDays <= daysLeft;
+            const status = onTrack
+            ? `<span class="text-emerald-400">On track at ${target}/day</span>`
+            : `<span class="text-rose-400">Behind: ${target}/day won't finish in time</span>`;
+
             document.getElementById("paceNote").innerHTML =
-            `<i class="fa-regular fa-clock mr-1"></i> ${daysLeft} days left · need <b class="text-brand-500">${perDay} videos/day</b> to finish by 30 Apr 2027`;
+            `<i class="fa-regular fa-clock mr-1"></i> ${daysLeft} days left · need <b class="text-brand-500">${perDay}/day</b> · ${status}`;
         }
 
         /* Daily Checklist Editing Functions */
