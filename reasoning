@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC CGL 2027 - Reasoning Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            900: '#701a75',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-12 antialiased selection:bg-purple-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-purple-600 text-white p-2 rounded-xl shadow-md shadow-purple-500/20">
+                    <i class="fa-solid fa-brain text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-white">Reasoning Mastery Tracker</h1>
+                    <p class="text-xs text-slate-400" id="currentDateDisplay">Loading date...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Maths Tracker</span>
+                </a>
+                <button id="resetReasoningBtn" class="text-xs bg-slate-800 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-800/50 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 pt-4 space-y-5">
+        
+        <!-- Overall Progress Summary Section -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-sm">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Reasoning Syllabus Progress</h2>
+                    <div class="flex items-baseline space-x-2 mt-0.5">
+                        <span id="overallPercentage" class="text-3xl font-extrabold text-white">0%</span>
+                        <span id="videoFraction" class="text-sm text-slate-400 font-medium">0 / 139 vids</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-[11px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-full font-medium inline-block">
+                        <i class="fa-solid fa-list-check mr-1"></i> 40 Topics Total
+                    </span>
+                </div>
+            </div>
+
+            <div class="w-full bg-slate-950 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                <div id="overallProgressBar" class="bg-gradient-to-r from-purple-600 to-pink-400 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+
+            <!-- Stats breakdown cards -->
+            <div class="grid grid-cols-3 gap-2 pt-1">
+                <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase font-semibold">Total Videos</p>
+                    <p class="text-lg font-bold text-slate-200 mt-0.5">139</p>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase font-semibold">Completed</p>
+                    <p id="statCompleted" class="text-lg font-bold text-emerald-400 mt-0.5">0</p>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase font-semibold">Remaining</p>
+                    <p id="statRemaining" class="text-lg font-bold text-amber-400 mt-0.5">139</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Container -->
+        <div id="categoriesContainer" class="space-y-6">
+            <!-- Populated via JavaScript -->
+        </div>
+
+    </main>
+
+    <script>
+        const REASONING_CATEGORIES = [
+            {
+                category: "1. Verbal Reasoning",
+                topics: [
+                    { id: "r_alphabet", name: "Alphabet", total: 3 },
+                    { id: "r_calender", name: "Calendar", total: 4 },
+                    { id: "r_dice", name: "Dice", total: 3 },
+                    { id: "r_direction", name: "Direction", total: 5 },
+                    { id: "r_cuboid", name: "Cuboid and Cube", total: 4 },
+                    { id: "r_ranking", name: "Ranking Arrangement", total: 3 },
+                    { id: "r_seating", name: "Seating Arrangement", total: 6 },
+                    { id: "r_blood", name: "Blood Relation", total: 6 },
+                    { id: "r_alphabet_series", name: "Alphabet Series", total: 2 },
+                    { id: "r_letter_series", name: "Letter Series", total: 2 },
+                    { id: "r_number_series", name: "Number Series", total: 5 },
+                    { id: "r_missing_number", name: "Missing Number", total: 2 },
+                    { id: "r_alphanumeric", name: "Alphanumeric Symbol Series", total: 1 },
+                    { id: "r_coding_decoding", name: "Coding Decoding", total: 5 },
+                    { id: "r_analogy", name: "Analogy", total: 4 },
+                    { id: "r_clock", name: "Clock", total: 4 },
+                    { id: "r_similarity", name: "Similarity", total: 2 },
+                    { id: "r_odd_one_out", name: "Odd One Out", total: 3 },
+                    { id: "r_math_op", name: "Mathematical Operation", total: 2 },
+                    { id: "r_venn", name: "Venn Diagram", total: 3 },
+                    { id: "r_words_arr", name: "Arrangement of Words", total: 6 },
+                    { id: "r_puzzle", name: "Puzzle", total: 5 }
+                ]
+            },
+            {
+                category: "2. Analytical & Logical Reasoning",
+                topics: [
+                    { id: "r_input_output", name: "Input and Output", total: 6 },
+                    { id: "r_syllogism", name: "Syllogism", total: 9 },
+                    { id: "r_coding_inequality", name: "Coding Inequality", total: 3 },
+                    { id: "r_data_sufficiency", name: "Data Sufficiency", total: 4 },
+                    { id: "r_stmt_arr", name: "Statement Arrangement", total: 3 },
+                    { id: "r_stmt_arg", name: "Statement Argument", total: 3 },
+                    { id: "r_stmt_assump", name: "Statement Assumption", total: 3 },
+                    { id: "r_course_action", name: "Course of Action", total: 4 },
+                    { id: "r_cause_effect", name: "Cause and Effect", total: 4 },
+                    { id: "r_decision_making", name: "Decision Making", total: 2 }
+                ]
+            },
+            {
+                category: "3. Non-Verbal Reasoning",
+                topics: [
+                    { id: "r_counting_fig", name: "Counting Figure", total: 6 },
+                    { id: "r_mirror_water", name: "Mirror and Water Image", total: 2 },
+                    { id: "r_paper_cut", name: "Paper Cutting & Folding", total: 2 },
+                    { id: "r_embedded", name: "Embedded Figures", total: 2 },
+                    { id: "r_fig_completion", name: "Figure Completion", total: 2 },
+                    { id: "r_fig_class", name: "Classification of Figure", total: 1 },
+                    { id: "r_dot_situation", name: "Dot Situation", total: 1 },
+                    { id: "r_fig_series", name: "Figure Series", total: 2 }
+                ]
+            }
+        ];
+
+        const STORAGE_KEY = "ssc_cgl_reasoning_2027_data";
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    console.error("Error parsing reasoning storage", e);
+                }
+            }
+            return {};
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        let appState = loadState();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initDateDisplay();
+            renderApp();
+
+            document.getElementById("resetReasoningBtn").addEventListener("click", () => {
+                if (confirm("Are you sure you want to reset all Reasoning progress?")) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    appState = loadState();
+                    renderApp();
+                }
+            });
+        });
+
+        function initDateDisplay() {
+            const now = new Date();
+            const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+            document.getElementById("currentDateDisplay").innerText = now.toLocaleDateString('en-US', options);
+        }
+
+        function renderApp() {
+            renderSummary();
+            renderCategories();
+        }
+
+        function renderSummary() {
+            let totalVids = 139;
+            let completedVids = 0;
+
+            REASONING_CATEGORIES.forEach(cat => {
+                cat.topics.forEach(t => {
+                    completedVids += (appState[t.id] || 0);
+                });
+            });
+
+            const pct = Math.min(100, Math.round((completedVids / totalVids) * 100));
+            const remaining = Math.max(0, totalVids - completedVids);
+
+            document.getElementById("overallPercentage").innerText = `${pct}%`;
+            document.getElementById("videoFraction").innerText = `${completedVids} / ${totalVids} vids`;
+            document.getElementById("overallProgressBar").style.width = `${pct}%`;
+            document.getElementById("statCompleted").innerText = completedVids;
+            document.getElementById("statRemaining").innerText = remaining;
+        }
+
+        function renderCategories() {
+            const container = document.getElementById("categoriesContainer");
+            container.innerHTML = "";
+
+            REASONING_CATEGORIES.forEach((catGroup, idx) => {
+                const section = document.createElement("section");
+                section.className = "bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm";
+
+                let topicsHtml = "";
+                catGroup.topics.forEach(t => {
+                    const count = appState[t.id] || 0;
+                    const pct = Math.min(100, Math.round((count / t.total) * 100));
+
+                    topicsHtml += `
+                        <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-200">${t.name}</h4>
+                                    <p class="text-[10px] text-slate-400">${count} of ${t.total} videos (${pct}%)</p>
+                                </div>
+                                <div class="flex items-center space-x-1 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+                                    <button onclick="adjustTopic('${t.id}', -1, ${t.total})" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold text-xs flex items-center justify-center active:scale-95 transition">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
+                                    <input type="number" min="0" max="${t.total}" value="${count}" 
+                                        onchange="setTopicValue('${t.id}', this.value, ${t.total})"
+                                        class="w-8 text-center bg-transparent text-xs font-bold text-slate-200 focus:outline-none">
+                                    <button onclick="adjustTopic('${t.id}', 1, ${t.total})" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold text-xs flex items-center justify-center active:scale-95 transition">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                                <div class="bg-purple-500 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                section.innerHTML = `
+                    <div class="flex items-center space-x-2 pb-1 border-b border-slate-800">
+                        <i class="fa-solid fa-folder-open text-purple-400"></i>
+                        <h3 class="font-bold text-sm text-white">${catGroup.category}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        ${topicsHtml}
+                    </div>
+                `;
+
+                container.appendChild(section);
+            });
+        }
+
+        function adjustTopic(topicId, delta, max) {
+            let current = appState[topicId] || 0;
+            let updated = current + delta;
+            if (updated < 0) updated = 0;
+            if (updated > max) updated = max;
+
+            appState[topicId] = updated;
+            saveState();
+            renderApp();
+        }
+
+        function setTopicValue(topicId, val, max) {
+            let num = parseInt(val) || 0;
+            if (num < 0) num = 0;
+            if (num > max) num = max;
+
+            appState[topicId] = num;
+            saveState();
+            renderApp();
+        }
+    </script>
+</body>
+</html>
