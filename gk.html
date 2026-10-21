@@ -106,6 +106,22 @@
             opacity: 0.9;
         }
 
+        .reset-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
         .module-card {
             background-color: var(--card-bg);
             border-radius: 12px;
@@ -197,13 +213,6 @@
         .delete-task:hover {
             color: var(--accent-red);
         }
-
-        .empty-state {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 40px 0;
-            font-style: italic;
-        }
     </style>
 </head>
 <body>
@@ -212,16 +221,22 @@
     <header>
         <div>
             <h1>📚 GK Command Center</h1>
-            <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Custom Module & Weekly Goal Tracker</p>
+            <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Official Complete SSC CGL General Awareness Syllabus</p>
         </div>
         <a href="index.html" class="back-btn">← Back to Main Tracker</a>
     </header>
 
-    <!-- Form to Add New Subject/Module -->
+    <!-- Controls Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Manage or create subjects & sub-topics dynamically below.</span>
+        <button class="reset-btn" onclick="resetToDefault()">↺ Reset to Default Syllabus</button>
+    </div>
+
+    <!-- Form to Add Custom Subject/Module -->
     <div class="add-module-card">
-        <h3 style="margin: 0 0 8px 0; font-size: 1rem;">➕ Create New GK Subject Module</h3>
+        <h3 style="margin: 0 0 8px 0; font-size: 1rem;">➕ Add New Custom Subject / Module</h3>
         <div class="form-group">
-            <input type="text" id="new-module-name" placeholder="e.g., Indian Polity, Modern History, Geography">
+            <input type="text" id="new-module-name" placeholder="e.g., Computer Knowledge, Environment & Ecology">
             <button class="btn" onclick="addModule()">Add Subject</button>
         </div>
     </div>
@@ -231,8 +246,93 @@
 </div>
 
 <script>
-    // Data structure loaded from LocalStorage
-    let gkData = JSON.parse(localStorage.getItem('gkMasterData')) || [];
+    // Complete Official Syllabus pre-loaded as default
+    const defaultSyllabus = [
+        {
+            id: 1,
+            name: "Indian Polity (Nov – Dec 2026)",
+            tasks: [
+                { id: 101, text: "Polity W1: Making of Constitution, Drafting Committee & Borrowed Sources", completed: false },
+                { id: 102, text: "Polity W2: Preamble, Parts 1-4 & Schedules 1 to 12 Overview", completed: false },
+                { id: 103, text: "Polity W3: Fundamental Rights (Articles 12 to 35) & Writs (Art 32)", completed: false },
+                { id: 104, text: "Polity W4: Directive Principles (DPSP 36-51) & Fundamental Duties (51A)", completed: false },
+                { id: 105, text: "Polity W5: President, Vice President & Pardoning Powers (Art 52-72)", completed: false },
+                { id: 106, text: "Polity W6: Prime Minister, Council of Ministers & Attorney General (Art 76)", completed: false },
+                { id: 107, text: "Polity W7: Parliament (Lok Sabha vs Rajya Sabha) & How a Bill Passes", completed: false },
+                { id: 108, text: "Polity W8: Supreme Court, High Courts, CAG & 300 PYQ Marathon Sweep", completed: false }
+            ]
+        },
+        {
+            id: 2,
+            name: "Ancient & Medieval History (Jan 2027)",
+            tasks: [
+                { id: 201, text: "Ancient W1: Indus Valley Civilization Sites, Town Planning & Vedic Culture", completed: false },
+                { id: 202, text: "Ancient W2: Buddhism, Jainism, Mauryan Empire (Ashoka) & Gupta Dynasty", completed: false },
+                { id: 203, text: "Medieval W1: Delhi Sultanate (Slave, Khilji, Tughlaq, Sayyid, Lodi Dynasties)", completed: false },
+                { id: 204, text: "Medieval W2: Mughal Empire (Babur to Aurangzeb), Bhakti & Sufi Movements", completed: false }
+            ]
+        },
+        {
+            id: 3,
+            name: "Modern Indian History (Feb 2027)",
+            tasks: [
+                { id: 301, text: "Modern W1: Revolt of 1857 & Socio-Religious Reform Movements (Brahmo/Arya Samaj)", completed: false },
+                { id: 302, text: "Modern W2: Formation of INC (1885), Moderates vs Extremists & Bengal Partition (1905)", completed: false },
+                { id: 303, text: "Modern W3: Gandhian Era (Non-Cooperation, Civil Disobedience & Salt March)", completed: false },
+                { id: 304, text: "Modern W4: Revolutionary Movements, Quit India (1942) to Independence (1947)", completed: false }
+            ]
+        },
+        {
+            id: 4,
+            name: "Geography & Earth Systems (March 2027)",
+            tasks: [
+                { id: 401, text: "Geog W1: Solar System, Earth Latitudes, Longitudes & Interior Structure", completed: false },
+                { id: 402, text: "Geog W2: Indian Physical Geography (Himalayas, Plains & Peninsular Plateau)", completed: false },
+                { id: 403, text: "Geog W3: Indian River Systems (Indus, Ganga, Brahmaputra & Peninsular Rivers)", completed: false },
+                { id: 404, text: "Geog W4: Indian Climate, Soil Types, Agriculture & National Parks (200 PYQs)", completed: false }
+            ]
+        },
+        {
+            id: 5,
+            name: "Static GK & Culture Sprint (April 2027)",
+            tasks: [
+                { id: 501, text: "Static W1: Classical & Folk Dances of India (State-wise & Famous Dancers)", completed: false },
+                { id: 502, text: "Static W2: Famous Temples, Monuments & UNESCO World Heritage Sites", completed: false },
+                { id: 503, text: "Static W3: Important Musical Instruments & Maestros (Tabla, Sitar, Shehnai)", completed: false },
+                { id: 504, text: "Static W4: Sports Trophies, International Orgs & Final 400 PYQ Master Marathon", completed: false }
+            ]
+        },
+        {
+            id: 6,
+            name: "General Science Foundations (10th NCERT Level)",
+            tasks: [
+                { id: 601, text: "Biology: Cell Structure, Human Body Systems (Digestive/Nervous) & Vitamins/Diseases", completed: false },
+                { id: 602, text: "Physics: SI Units, Laws of Motion, Work/Energy, Light, Sound & Electricity", completed: false },
+                { id: 603, text: "Chemistry: Acids, Bases, Salts, Periodic Table, Metals/Non-Metals & Daily Chemical Names", completed: false }
+            ]
+        },
+        {
+            id: 7,
+            name: "Indian Economy Essentials",
+            tasks: [
+                { id: 701, text: "Econ: GDP, Inflation, Repo Rate, RBI Monetary Policy & Banking Basics", completed: false },
+                { id: 702, text: "Econ: Five-Year Plans, Union Budget, NITI Aayog & Poverty/Unemployment Schemes", completed: false }
+            ]
+        },
+        {
+            id: 8,
+            name: "Current Affairs (Oct 2026 – March 2027 Track)",
+            tasks: [
+                { id: 801, text: "CA 1: Major Government Schemes & Ministries (Last 6 Months)", completed: false },
+                { id: 802, text: "CA 2: National & International Appointments, Awards & Honours", completed: false },
+                { id: 803, text: "CA 3: Sports Tournaments, Grand Slams & Defense Exercises", completed: false },
+                { id: 804, text: "CA 4: Books & Authors, Summits & Important Days/Themes", completed: false }
+            ]
+        }
+    ];
+
+    // Load stored state or populate defaults
+    let gkData = JSON.parse(localStorage.getItem('gkMasterData')) || defaultSyllabus;
 
     document.addEventListener("DOMContentLoaded", function() {
         renderModules();
@@ -260,7 +360,7 @@
     }
 
     function deleteModule(moduleId) {
-        if (confirm("Are you sure you want to delete this entire subject module?")) {
+        if (confirm("Are you sure you want to delete this subject module?")) {
             gkData = gkData.filter(m => m.id !== moduleId);
             saveData();
             renderModules();
@@ -305,18 +405,17 @@
         }
     }
 
+    function resetToDefault() {
+        if (confirm("This will reset all your modules back to the default syllabus state. Proceed?")) {
+            gkData = defaultSyllabus;
+            saveData();
+            renderModules();
+        }
+    }
+
     function renderModules() {
         const container = document.getElementById('modules-container');
         container.innerHTML = '';
-
-        if (gkData.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    No subject modules created yet. Add your first subject (e.g., "Indian Polity") above to get started!
-                </div>
-            `;
-            return;
-        }
 
         gkData.forEach(module => {
             const totalTasks = module.tasks.length;
@@ -328,7 +427,7 @@
 
             card.innerHTML = `
                 <div class="module-header">
-                    <h3 class="module-title">🏛️ ${module.name}</h3>
+                    <h3 class="module-title">📌 ${module.name}</h3>
                     <div>
                         <span style="font-size: 0.85rem; color: var(--text-muted); margin-right: 12px;">${completedTasks}/${totalTasks} Done (${percent}%)</span>
                         <button class="delete-btn" onclick="deleteModule(${module.id})">Delete Subject</button>
@@ -342,23 +441,11 @@
                 <ul class="task-list">
                     ${module.tasks.map(task => `
                         <li class="task-item">
-                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${module.id},${task.id})">
+                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${module.id}, ${task.id})">
                             <span class="task-label ${task.completed ? 'completed' : ''}">${task.text}</span>
-                            <button class="delete-task" onclick="deleteTask(${module.id},${task.id})">✕</button>
+                            <button class="delete-task" onclick="deleteTask(${module.id}, ${task.id})">✕</button>
                         </li>
                     `).join('')}
                 </ul>
 
-                <div class="form-group">
-                    <input type="text" id="input-task-${module.id}" placeholder="Add goal (e.g., Week 1: Fundamental Rights)">
-                    <button class="btn" style="padding: 8px 14px; font-size: 0.85rem;" onclick="addTask(${module.id})">Add Goal</button>
-                </div>
-            `;
-
-            container.appendChild(card);
-        });
-    }
-</script>
-
-</body>
-</html>
+                <div class="form-group
