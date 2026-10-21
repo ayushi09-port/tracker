@@ -106,22 +106,6 @@
             opacity: 0.9;
         }
 
-        .reset-btn {
-            background-color: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-
-        .reset-btn:hover {
-            color: var(--accent-red);
-            border-color: var(--accent-red);
-        }
-
         .module-card {
             background-color: var(--card-bg);
             border-radius: 12px;
@@ -226,17 +210,11 @@
         <a href="index.html" class="back-btn">← Back to Main Tracker</a>
     </header>
 
-    <!-- Controls Bar -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <span style="font-size: 0.85rem; color: var(--text-muted);">Manage or create subjects & sub-topics dynamically below.</span>
-        <button class="reset-btn" onclick="resetToDefault()">↺ Reset to Default Syllabus</button>
-    </div>
-
     <!-- Form to Add Custom Subject/Module -->
     <div class="add-module-card">
-        <h3 style="margin: 0 0 8px 0; font-size: 1rem;">➕ Add New Custom Subject / Module</h3>
+        <h3 style="margin: 0 0 8px 0; font-size: 1rem;">➕ Add Custom Subject or Topic</h3>
         <div class="form-group">
-            <input type="text" id="new-module-name" placeholder="e.g., Computer Knowledge, Environment & Ecology">
+            <input type="text" id="new-module-name" placeholder="e.g., Computer Awareness, Extra Quizzes">
             <button class="btn" onclick="addModule()">Add Subject</button>
         </div>
     </div>
@@ -246,7 +224,7 @@
 </div>
 
 <script>
-    // Complete Official Syllabus pre-loaded as default
+    // Complete Official Syllabus pre-loaded
     const defaultSyllabus = [
         {
             id: 1,
@@ -331,7 +309,7 @@
         }
     ];
 
-    // Load stored state or populate defaults
+    // Load from LocalStorage or initialize with default syllabus
     let gkData = JSON.parse(localStorage.getItem('gkMasterData')) || defaultSyllabus;
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -405,14 +383,6 @@
         }
     }
 
-    function resetToDefault() {
-        if (confirm("This will reset all your modules back to the default syllabus state. Proceed?")) {
-            gkData = defaultSyllabus;
-            saveData();
-            renderModules();
-        }
-    }
-
     function renderModules() {
         const container = document.getElementById('modules-container');
         container.innerHTML = '';
@@ -441,11 +411,23 @@
                 <ul class="task-list">
                     ${module.tasks.map(task => `
                         <li class="task-item">
-                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${module.id}, ${task.id})">
+                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${module.id},${task.id})">
                             <span class="task-label ${task.completed ? 'completed' : ''}">${task.text}</span>
-                            <button class="delete-task" onclick="deleteTask(${module.id}, ${task.id})">✕</button>
+                            <button class="delete-task" onclick="deleteTask(${module.id},${task.id})">✕</button>
                         </li>
                     `).join('')}
                 </ul>
 
-                <div class="form-group
+                <div class="form-group">
+                    <input type="text" id="input-task-${module.id}" placeholder="Add goal (e.g., Week 5: Art & Culture)">
+                    <button class="btn" style="padding: 8px 14px; font-size: 0.85rem;" onclick="addTask(${module.id})">Add Goal</button>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>
